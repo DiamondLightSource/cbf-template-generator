@@ -1,0 +1,25 @@
+# Compiled Python files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Temporary files
+.cache
+.pytest_cache
+
+# Regression test outputs
+/Test/regression/output
+
+# Ignored Mathematica files shall be prefixed by _
+_*.nb
+*.fdb_latexmk
+*.gz
+*.pdf
+.DS_Store
+*~
+*.sw[op]
+*.log
+.olex
+.git-notifier*
+git-notifier.log
+.gitversion
