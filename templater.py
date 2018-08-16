@@ -36,6 +36,14 @@ def read_miniCBF_image(image):
     token, value = record.split(':')
     parameters[token.strip()] = value.strip()
 
+  def tidy_parameter_value(value):
+    for cruft in [',', '(', ')', 'deg.', 'm', 'A']:
+      value = value.replace(cruft, ' ')
+    return [token.strip() for token in value.split()]
+
+  for k in parameters:
+    parameters[k] = tidy_parameter_value(parameters[k])
+
   return cbf_header, parameters, image_data
 
 if __name__ == '__main__':
@@ -43,4 +51,5 @@ if __name__ == '__main__':
 
   cbf_header, parameters, image_data = read_miniCBF_image(sys.argv[1])
 
-  print(parameters)
+  for key in sorted(parameters):
+    print(key, parameters[key])
