@@ -12,7 +12,7 @@ class i19_1_template_generator(dls_template_generator):
     common = {'goniometer':{'axes':{
       'omega':{'axis':(1,0,0), 'depends_on':'.'},
       'phi':{'axis':(0.642788,-0.766044,0), 'depends_on':'omega'}
-      }}, 'detector':{'axes':{
+      }}, 'detector':{'name':'DECTRIS PILATUS 2M', 'axes':{
         '2theta':{'axis':(1,0,0), 'depends_on':'.'},
         'z':{'axis':(0,0,-1), 'depends_on':'2theta'}
       }}}

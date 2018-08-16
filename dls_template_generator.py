@@ -6,7 +6,7 @@ class dls_template_generator(template_generator):
   def __init__(self, beamline, data_collection_info):
     # prior knowledge - common things like detector x, y, z axes
 
-    common = {'detector':{'axes':{
+    common = {'detector':{'name':'no-idea', 'axes':{
       'x':{'axis':(1,0,0), 'depends_on':'y'},
       'y':{'axis':(0,-1,0), 'depends_on':'z'},
       'z':{'axis':(0,0,-1), 'depends_on':'.'}
@@ -105,5 +105,13 @@ _diffrn_measurement.method
 _diffrn_measurement.sample_detector_distance
  %s GONIOMETER %d rotation %.2f
 ''' % (self._beamline, len(gi['axes']), di['distance_mm'])
+
+    header += '''
+loop_
+_diffrn_radiation_wavelength.id
+_diffrn_radiation_wavelength.wavelength
+_diffrn_radiation_wavelength.wt
+ WAVELENGTH1 _wave_ 1
+'''
 
     return header
