@@ -6,7 +6,7 @@ def read_miniCBF_image(image):
 
   import binascii
   start_tag = binascii.unhexlify('0c1a04d5')
-  data = open(in_image, 'rb').read()
+  data = open(image, 'rb').read()
   data_offset = data.find(start_tag)
   cbf_header = data[:data_offset]
   image_data = data[data_offset:]
@@ -22,7 +22,7 @@ def read_miniCBF_image(image):
     record = record.strip()
 
     if len(record[1:].split()) <= 2 and record.count(':') == 2:
-      self._cif_header_dictionary['timestamp'] = record[1:].strip()
+      parameters['timestamp'] = record[1:].strip()
       continue
 
     tokens = record.replace('=', '').replace(':', '').split()[1:]
@@ -37,3 +37,10 @@ def read_miniCBF_image(image):
     parameters[token.strip()] = value.strip()
 
   return cbf_header, parameters, image_data
+
+if __name__ == '__main__':
+  import sys
+
+  cbf_header, parameters, image_data = read_miniCBF_image(sys.argv[1])
+
+  print(parameters)
