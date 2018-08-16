@@ -6,7 +6,8 @@ class dls_template_generator(template_generator):
   def __init__(self, beamline, data_collection_info):
     # prior knowledge - common things like detector x, y, z axes
 
-    common = {'detector':{'name':'no-idea', 'axes':{
+    common = {'detector':{'name':'DECTRIS', 'fast':(1,0,0), 'slow':(0,-1,0),
+      'axes':{
       'x':{'axis':(1,0,0), 'depends_on':'y'},
       'y':{'axis':(0,-1,0), 'depends_on':'z'},
       'z':{'axis':(0,0,-1), 'depends_on':'.'}

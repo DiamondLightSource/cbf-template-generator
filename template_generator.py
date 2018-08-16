@@ -61,7 +61,7 @@ _diffrn_detector_axis.detector_id
 _diffrn_detector_axis.axis_id
 '''
     for axis in unrolled:
-      block += '''DETECTOR DETECTOR_%s
+      block += '''DETECTOR DET_%s
 ''' % axis.upper()
 
     block += '''
@@ -103,13 +103,13 @@ _diffrn_scan_axis.displacement_increment
 
     for axis in unrolled:
       if axis in detector_rotations:
-        block += '''SCAN1 DETECTOR_%s _%s_ 0.0 0.0 0.0 0.0 0.0
+        block += '''SCAN1 DET_%s _%s_ 0.0 0.0 0.0 0.0 0.0
 ''' % (axis.upper(), axis)
       elif axis == 'z':
-        block += '''SCAN1 DETECTOR_Z 0.0 0.0 0.0 %f 0.0 0.0
+        block += '''SCAN1 DET_Z 0.0 0.0 0.0 %f 0.0 0.0
 ''' % di['distance_mm']
       else:
-        block += '''SCAN1 DETECTOR_%s 0.0 0.0 0.0 0.0 0.0 0.0
+        block += '''SCAN1 DET_%s 0.0 0.0 0.0 0.0 0.0 0.0
 ''' % (axis.upper())
 
     block += '''
@@ -122,13 +122,13 @@ _diffrn_scan_frame_axis.displacement
 
     for axis in unrolled:
       if axis in detector_rotations:
-        block += '''FRAME1 DETECTOR_%s _%s_ 0.0
+        block += '''FRAME1 DET_%s _%s_ 0.0
 ''' % (axis.upper(), axis)
       elif axis == 'z':
-        block += '''FRAME1 DETECTOR_Z 0.0 %f
+        block += '''FRAME1 DET_Z 0.0 %f
 ''' % di['distance_mm']
       else:
-        block += '''FRAME1 DETECTOR_%s 0.0 0.0
+        block += '''FRAME1 DET_%s 0.0 0.0
 ''' % (axis.upper())
 
     block += '''
@@ -144,15 +144,30 @@ _axis.offset[1] _axis.offset[2] _axis.offset[3]
       x, y, z = axes[axis]['axis']
       depends = axes[axis]['depends_on']
       if depends != '.':
-        depends = 'DETECTOR_%s' % depends.upper()
+        depends = 'DET_%s' % depends.upper()
       if axis in detector_rotations:
-        block += '''DETECTOR_%s rotation detector %s %f %f %f . . .
+        block += '''DET_%s rotation detector %s %f %f %f . . .
 ''' % (axis.upper(), depends, x, y, z)
       else:
-        block += '''DETECTOR_%s translation detector %s %f %f %f . . .
+        block += '''DET_%s translation detector %s %f %f %f . . .
 ''' % (axis.upper(), depends, x, y, z)
 
+    # now we add the beam centre and fast, slow axes explicitly
+    if 'PILATUS' in di['name']:
+      pixel_size = 0.172
+    elif 'EIGER' in di['name']:
+      pixel_size = 0.075
 
+    offset_fast = pixel_size * di['beam_x_pixel']
+    offset_slow = pixel_size * di['beam_y_pixel']
+
+    dx, dy, dz = [-1 * offset_fast * di['fast'][j] +
+             -1 * offset_slow * di['slow'][j] for j in range(3)]
+
+    block += '''DET_SLOW translation detector DET_%s %f %f %f %f %f %f
+''' % (axis.upper(), di['slow'][0], di['slow'][1], di['slow'][2], dx, dy, dz)
+    block += '''DET_FAST translation detector DET_SLOW %f %f %f 0.0 0.0 0.0
+''' % (di['fast'][0], di['fast'][1], di['fast'][2])
 
     return block
 
@@ -182,7 +197,7 @@ _diffrn_measurement_axis.axis_id
 '''
 
     for axis in unrolled:
-      block += '''GONIOMETER GONIOMETER_%s
+      block += '''GONIOMETER GON_%s
 ''' % axis.upper()
 
     scannable_axes = ['omega', 'chi', 'phi']
@@ -200,10 +215,10 @@ _diffrn_scan_axis.displacement_increment
 '''
     for axis in unrolled:
       if axis in scannable_axes:
-        block += '''SCAN1 GONIOMETER_%s _%s_ _d%s_ _d%s_ 0.0 0.0 0.0
+        block += '''SCAN1 GON_%s _%s_ _d%s_ _d%s_ 0.0 0.0 0.0
 ''' % (axis.upper(), axis, axis, axis)
       else:
-        block += '''SCAN1 GONIOMETER_%s _%s_ 0.0 0.0 0.0 0.0 0.0
+        block += '''SCAN1 GON_%s _%s_ 0.0 0.0 0.0 0.0 0.0
 ''' % (axis.upper(), axis)
 
     block += '''
@@ -215,7 +230,7 @@ _diffrn_scan_frame_axis.displacement
 '''
 
     for axis in unrolled:
-      block += '''FRAME1 GONIOMETER_%s _%s_ 0.0
+      block += '''FRAME1 GON_%s _%s_ 0.0
 ''' % (axis.upper(), axis)
 
     block += '''
@@ -231,8 +246,8 @@ _axis.offset[1] _axis.offset[2] _axis.offset[3]
       x, y, z = axes[axis]['axis']
       depends = axes[axis]['depends_on']
       if depends != '.':
-        depends = 'GONIOMETER_%s' % depends.upper()
-      block += '''GONIOMETER_%s rotation goniometer %s %f %f %f . . .
+        depends = 'GON_%s' % depends.upper()
+      block += '''GON_%s rotation goniometer %s %f %f %f . . .
 ''' % (axis.upper(), depends, x, y, z)
 
     return block
