@@ -7,15 +7,12 @@ def template_generator_factory(beamline, data_collection_info):
 
   if beamline == 'ixx':
     return dls_template_generator(beamline, data_collection_info)
+
   if beamline == 'i19-1':
     return i19_1_template_generator(beamline, data_collection_info)
 
 if __name__ == '__main__':
-  example_dc_info = {'goniometer':{'axes':{
-    'omega':{'axis':(1,0,0), 'depends_on':'.'}
-    }
-    }
-    }
+  example_dc_info = {'detector':{'distance_mm':187.5}}
 
   import sys
   generator = template_generator_factory(sys.argv[1], example_dc_info)

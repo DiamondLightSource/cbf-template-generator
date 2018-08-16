@@ -12,17 +12,12 @@ class i19_1_template_generator(dls_template_generator):
     common = {'goniometer':{'axes':{
       'omega':{'axis':(1,0,0), 'depends_on':'.'},
       'phi':{'axis':(0.642788,-0.766044,0), 'depends_on':'omega'}
-      }
-      }, 'detector':{'axes':{
+      }}, 'detector':{'axes':{
         '2theta':{'axis':(1,0,0), 'depends_on':'.'},
         'z':{'axis':(0,0,-1), 'depends_on':'2theta'}
-      }
-      }}
+      }}}
 
     self.recursive_update(common, data_collection_info)
-
     dls_template_generator.__init__(self, beamline, common)
-
-
 
     return

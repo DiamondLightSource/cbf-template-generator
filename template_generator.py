@@ -26,6 +26,7 @@ class template_generator(object):
   def goniometer(self):
     return ''
 
+
   def scan(self):
     return ''
 
