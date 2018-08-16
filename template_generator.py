@@ -20,10 +20,52 @@ class template_generator(object):
 
   def __call__(self):
     return '\n'.join([self.header(), self.source(), self.detector(),
-                      self.goniometer(), self.scan(), self.tailer()])
+                      self.goniometer(), self.scan(), self.tailer()]).strip()
 
   def header(self):
-    return ''
+    import datetime
+    date_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+    gi = self.goniometer_info()
+    di = self.detector_info()
+
+    header = '''###CBF: VERSION 1.1
+# Template auto generated at %s
+# DECTRIS translation table:
+@ Exposure_time     _expt_
+@ Exposure_period   _expp_
+@ Omega             _omega_
+@ Omega_increment   _domega_
+@ Timestamp         _timestamp_
+@ Count_cutoff      _cutoff_
+@ Compression_type  _compress_
+@ X_dimension       _wide_
+@ Y_dimension       _high_
+@ Wavelength        _wave_
+''' % date_str
+
+    if 'chi' in gi['axes']:
+      header += '''@ Chi               _chi_
+@ Chi_increment     _dchi_
+'''
+
+    if 'phi' in gi['axes']:
+      header += '''@ Phi               _phi_
+@ Phi_increment     _dphi_
+'''
+
+    if 'kappa' in gi['axes']:
+      header += '''@ Kappa               _kappa_
+@ Kappa_increment     _dkappa_
+'''
+
+    if '2theta' in di['axes']:
+      header += '''@ Detector_2theta   _2theta_
+'''
+
+    header += '''--- End of preamble
+'''
+
+    return header
 
   def source(self):
 
@@ -193,6 +235,17 @@ _axis.offset[1] _axis.offset[2] _axis.offset[3]
 ''' % (axis.upper(), di['slow'][0], di['slow'][1], di['slow'][2], dx, dy, dz)
     block += '''DET_FAST translation detector DET_SLOW %f %f %f 0.0 0.0 0.0
 ''' % (di['fast'][0], di['fast'][1], di['fast'][2])
+
+    # and pixel size block
+    block += '''
+loop_
+_array_structure_list_axis.axis_set_id
+_array_structure_list_axis.axis_id
+_array_structure_list_axis.displacement
+_array_structure_list_axis.displacement_increment
+DET_FAST DET_FAST 0.0 %f
+DET_SLOW DET_SLOW 0.0 %f
+''' % (pixel_size, pixel_size)
 
     block += '''
 loop_
