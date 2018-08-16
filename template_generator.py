@@ -31,3 +31,8 @@ class template_generator(object):
 
   def tailer(self):
     return ''
+
+  # helper functions
+
+  def goniometer_info(self):
+    return self._data_collection_parameters['goniometer']
