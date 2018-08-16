@@ -36,3 +36,6 @@ class template_generator(object):
 
   def goniometer_info(self):
     return self._data_collection_parameters['goniometer']
+
+  def detector_info(self):
+    return self._data_collection_parameters['detector']

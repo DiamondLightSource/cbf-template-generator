@@ -13,7 +13,7 @@ if __name__ == '__main__':
     'chi':{'axis':(0,-1,0), 'depends_on':'omega'},
     'phi':{'axis':(1,0,0), 'depends_on':'chi'}
     }
-    }
+    }, 'detector':{'axes':{'2theta':(1,0,0)}}
     }
 
   generator = template_generator_factory('ixx', example_dc_info)
