@@ -26,11 +26,36 @@ class template_generator(object):
     return ''
 
   def source(self):
-    return ''
+
+    block = '''
+loop_
+_diffrn_radiation_wavelength.id
+_diffrn_radiation_wavelength.wavelength
+_diffrn_radiation_wavelength.wt
+WAVELENGTH1 _wave_ 1
+'''
+
+    return block
 
   def detector(self):
 
+    # other homeless header junk - not sure about the structure being
+    # ideal here, perhaps worth refactoring?
+
+    gi = self.goniometer_info()
     di = self.detector_info()
+
+    block = '''
+loop_
+_diffrn_measurement.diffrn_id
+_diffrn_measurement.id
+_diffrn_measurement.number_of_axes
+_diffrn_measurement.method
+_diffrn_measurement.sample_detector_distance
+ %s GONIOMETER %d rotation %.2f
+''' % (self._beamline, len(gi['axes']), di['distance_mm'])
+
+    # now proper detector things
 
     axes = di['axes']
 
@@ -46,7 +71,7 @@ class template_generator(object):
 
     unrolled = unroll(inverse_depends_on, '.')[1:]
 
-    block = '''
+    block += '''
 loop_
 _diffrn_detector.diffrn_id
 _diffrn_detector.id
@@ -169,6 +194,18 @@ _axis.offset[1] _axis.offset[2] _axis.offset[3]
     block += '''DET_FAST translation detector DET_SLOW %f %f %f 0.0 0.0 0.0
 ''' % (di['fast'][0], di['fast'][1], di['fast'][2])
 
+    block += '''
+loop_
+_array_structure_list.array_id
+_array_structure_list.index
+_array_structure_list.dimension
+_array_structure_list.precedence
+_array_structure_list.direction
+_array_structure_list.axis_set_id
+ARRAY1 1 _wide_ 1 increasing DET_FAST
+ARRAY1 2 _high_ 2 increasing DET_SLOW
+'''
+
     return block
 
   def goniometer(self):
@@ -253,10 +290,36 @@ _axis.offset[1] _axis.offset[2] _axis.offset[3]
     return block
 
   def scan(self):
-    return ''
+    return '''
+loop_
+_diffrn_scan_frame.frame_id
+_diffrn_scan_frame.frame_number
+_diffrn_scan_frame.integration_time
+_diffrn_scan_frame.exposure_time
+_diffrn_scan_frame.scan_id
+_diffrn_scan_frame.date
+ FRAME1 1 _expt_ _expp_ SCAN1 _timestamp_
+'''
 
   def tailer(self):
-    return ''
+    return '''
+loop_
+_array_intensities.array_id
+_array_intensities.binary_id
+_array_intensities.linearity
+_array_intensities.gain
+_array_intensities.gain_esd
+_array_intensities.overload
+_array_intensities.undefined_value
+ARRAY1 1 linear 1.0 . _cutoff_ -1
+
+loop_
+_array_structure.id
+_array_structure.encoding_type
+_array_structure.compression_type
+_array_structure.byte_order
+ARRAY1 "signed 32-bit integer" _compress_ little_endian
+'''
 
   # helper functions
 
@@ -265,6 +328,9 @@ _axis.offset[1] _axis.offset[2] _axis.offset[3]
 
   def detector_info(self):
     return self._data_collection_parameters['detector']
+
+  def beam_info(self):
+    return self._data_collection_parameters['beam']
 
   @staticmethod
   def recursive_update(original, overwrite):

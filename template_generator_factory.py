@@ -15,9 +15,11 @@ def template_generator_factory(beamline, data_collection_info):
     return i19_2_template_generator(beamline, data_collection_info)
 
 if __name__ == '__main__':
+  # this illustrates what we are expecting to be passed...
   example_dc_info = {'detector':{'distance_mm':187.5,
                                  'beam_x_pixel':1234.5,
-                                 'beam_y_pixel':1024.0}}
+                                 'beam_y_pixel':1024.0},
+                     'beam':{}}
 
   import sys
   generator = template_generator_factory(sys.argv[1], example_dc_info)
