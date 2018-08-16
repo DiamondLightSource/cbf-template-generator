@@ -39,3 +39,16 @@ class template_generator(object):
 
   def detector_info(self):
     return self._data_collection_parameters['detector']
+
+  @staticmethod
+  def recursive_update(original, overwrite):
+    '''Recursive update original dictionary with contents of overwrite.'''
+    import collections
+
+    for k, v in overwrite.iteritems():
+        if isinstance(v, collections.Mapping):
+            original[k] = template_generator.recursive_update(
+              original.get(k, {}), v)
+        else:
+            original[k] = v
+    return original

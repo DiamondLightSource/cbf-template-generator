@@ -4,7 +4,16 @@ from template_generator import template_generator
 
 class dls_template_generator(template_generator):
   def __init__(self, beamline, data_collection_info):
-    template_generator.__init__(self, beamline, data_collection_info)
+    # prior knowledge - common things like detector x, y, z axes
+
+    common = {'detector':{'axes':{
+      'x':{'axis':(1,0,0), 'depends_on':'y'},
+      'y':{'axis':(0,-1,0), 'depends_on':'z'},
+      'z':{'axis':(0,0,-1), 'depends_on':'.'}
+      }}}
+
+    self.recursive_update(common, data_collection_info)
+    template_generator.__init__(self, beamline, common)
     return
 
   def header(self):
