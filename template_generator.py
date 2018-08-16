@@ -131,6 +131,29 @@ _diffrn_scan_frame_axis.displacement
         block += '''FRAME1 DETECTOR_%s 0.0 0.0
 ''' % (axis.upper())
 
+    block += '''
+loop_
+_axis.id
+_axis.type
+_axis.equipment
+_axis.depends_on
+_axis.vector[1] _axis.vector[2] _axis.vector[3]
+_axis.offset[1] _axis.offset[2] _axis.offset[3]
+'''
+    for axis in unrolled:
+      x, y, z = axes[axis]['axis']
+      depends = axes[axis]['depends_on']
+      if depends != '.':
+        depends = 'DETECTOR_%s' % depends.upper()
+      if axis in detector_rotations:
+        block += '''DETECTOR_%s rotation detector %s %f %f %f . . .
+''' % (axis.upper(), depends, x, y, z)
+      else:
+        block += '''DETECTOR_%s translation detector %s %f %f %f . . .
+''' % (axis.upper(), depends, x, y, z)
+
+
+
     return block
 
   def goniometer(self):
@@ -206,8 +229,11 @@ _axis.offset[1] _axis.offset[2] _axis.offset[3]
 '''
     for axis in unrolled:
       x, y, z = axes[axis]['axis']
+      depends = axes[axis]['depends_on']
+      if depends != '.':
+        depends = 'GONIOMETER_%s' % depends.upper()
       block += '''GONIOMETER_%s rotation goniometer %s %f %f %f . . .
-''' % (axis.upper(), axes[axis]['depends_on'], x, y, z)
+''' % (axis.upper(), depends, x, y, z)
 
     return block
 
