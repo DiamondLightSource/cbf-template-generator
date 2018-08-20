@@ -38,6 +38,9 @@ class template_generator(object):
     di = self.detector_info()
 
     header = '''###CBF: VERSION 1.1
+
+data_junk
+
 # Template auto generated at %s
 # DECTRIS translation table:
 @ Exposure_time     _expt_
@@ -255,6 +258,15 @@ _array_structure_list_axis.displacement_increment
 DET_FAST DET_FAST 0.0 %f
 DET_SLOW DET_SLOW 0.0 %f
 ''' % (pixel_size, pixel_size)
+
+    block += '''
+loop_
+_array_element_size.array_id
+_array_element_size.index
+_array_element_size.size
+ARRAY1 1 %f
+ARRAY1 2 %f
+''' % (0.001 * pixel_size, 0.001 * pixel_size)
 
     block += '''
 loop_

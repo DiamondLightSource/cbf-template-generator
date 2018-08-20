@@ -105,6 +105,7 @@ def parameters_to_dc_info(parameters):
 
 def make_imgCIF(cbf_header, header, image_data):
   header = header.replace('--- End of preamble', '')
+  header = header.replace('# DECTRIS translation table:', '')
   header_text = '\n'.join([record for record in header.split('\n') if not
                            record.startswith('@')])
   mime = cbf_header.split('--CIF-BINARY-FORMAT-SECTION--')[1]
