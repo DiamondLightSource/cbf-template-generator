@@ -5,7 +5,7 @@ def template_generator_factory(beamline, data_collection_info):
   # FIXME there is probably a much better way of doing this without needing to
   # always import all - though the list of beamlines is small so...
 
-  if beamline == 'i02-1':
+  if beamline == 'i02-1' or beamline.lower() == 'vmxm':
     from i02_1_template_generator import i02_1_template_generator
     return i02_1_template_generator(beamline, data_collection_info)
 
@@ -29,6 +29,8 @@ def template_generator_factory(beamline, data_collection_info):
     from i24_template_generator import i24_template_generator
     return i24_template_generator(beamline, data_collection_info)
 
+  raise RuntimeError('unknown beamline %s' % beamline)
+
 if __name__ == '__main__':
   # this illustrates what we are expecting to be passed... much of the
   # information comes from camserver via MXSettings - which is picked up
@@ -39,5 +41,8 @@ if __name__ == '__main__':
                      'beam':{}}
 
   import sys
-  generator = template_generator_factory(sys.argv[1], example_dc_info)
-  print(generator())
+  try:
+    generator = template_generator_factory(sys.argv[1], example_dc_info)
+    print(generator())
+  except Exception as e:
+    print(e)
