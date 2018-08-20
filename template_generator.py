@@ -19,8 +19,17 @@ class template_generator(object):
     return
 
   def __call__(self):
-    return '\n'.join([self.header(), self.source(), self.detector(),
-                      self.goniometer(), self.scan(), self.tailer()]).strip()
+    result = '\n'.join([self.header(), self.source(), self.detector(),
+                        self.goniometer(), self.scan(), self.tailer()]).strip()
+
+    if 'camserver' in self._data_collection_parameters:
+      cs = self._data_collection_parameters['camserver']
+      for key in cs:
+        value = str(cs[key])
+        result = result.replace(key, value)
+
+    return result
+
 
   def header(self):
     import datetime

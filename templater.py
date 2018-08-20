@@ -31,13 +31,17 @@ def read_miniCBF_image(image):
 
   # now find the mime header section
   for record in cbf_header.split('\n'):
+    if record.startswith('     conversions='):
+      parameters['compression'] = record.strip().split('=')[-1][3:-1]
+      continue
     if not record.startswith('X-'):
       continue
     token, value = record.split(':')
     parameters[token.strip()] = value.strip()
 
   def tidy_parameter_value(value):
-    for cruft in [',', '(', ')', 'deg.', 'm', 'A']:
+    value = ' '.join([v for v in value.split() if not v in ['deg.', 'm', 'A']])
+    for cruft in [',', '(', ')', ]:
       value = value.replace(cruft, ' ')
     return [token.strip() for token in value.split()]
 
@@ -55,9 +59,10 @@ def parameters_to_dc_info(parameters):
   expp = float(parameters['Exposure_period'][0])
   omega = float(parameters['Omega'][0])
   domega = float(parameters['Omega_increment'][0])
-  cuttoff = int(parameters['Count_cutoff'][0])
+  cutoff = int(parameters['Count_cutoff'][0])
   wide = int(parameters['X-Binary-Size-Fastest-Dimension'][0])
   high = int(parameters['X-Binary-Size-Second-Dimension'][0])
+  compress = parameters['compression'][0]
 
   # put the parameters which would be filled in by camserver in an appropriate
   # dictionary
@@ -67,7 +72,9 @@ def parameters_to_dc_info(parameters):
                '_expp_':expp,
                '_omega_':omega,
                '_domega_':domega,
-               '_timestamp_':parameters[timestamp],
+               '_cutoff_':cutoff,
+               '_compress_':compress,
+               '_timestamp_':parameters['timestamp'][0],
                '_wide_':wide,
                '_high_':high}
 
@@ -84,7 +91,11 @@ def parameters_to_dc_info(parameters):
   if 'Kappa' in parameters:
     camserver['_kappa_'] = float(parameters['Kappa'][0])
 
-  dc_info = {'detector':{'distance_mm':distance_mm,
+  if 'Detector_2theta' in parameters:
+    camserver['_2theta_'] = float(parameters['Detector_2theta'][0])
+
+  dc_info = {'detector':{'name':' '.join(parameters['Detector']),
+                         'distance_mm':distance_mm,
                          'beam_x_pixel':beam_x_pixel,
                          'beam_y_pixel':beam_y_pixel},
              'beam':{},
@@ -95,10 +106,8 @@ def parameters_to_dc_info(parameters):
 if __name__ == '__main__':
   import sys
 
+  from template_generator_factory import template_generator_factory
   cbf_header, parameters, image_data = read_miniCBF_image(sys.argv[1])
-  generator = template_generator_factory(sys.argv[1], example_dc_info)
+  dc_info = parameters_to_dc_info(parameters)
+  generator = template_generator_factory(sys.argv[2], dc_info)
   print(generator())
-
-
-  for key in sorted(parameters):
-    print(key, parameters[key])
