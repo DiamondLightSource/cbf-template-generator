@@ -15,7 +15,7 @@ class i04_template_generator(dls_template_generator):
       'phi':{'axis':(1,0,0), 'depends_on':'chi'}
       }}, 'detector':{'name':'DECTRIS PILATUS 6M', 'axes':{
         'z':{'axis':(0,0,-1), 'depends_on':'.'}
-      }, 'fast':(0,1,0), 'slow':(1,0,0)}}
+      }, 'fast':(1,0,0), 'slow':(0,-1,0)}}
 
     self.recursive_update(common, data_collection_info)
     dls_template_generator.__init__(self, beamline, common)
