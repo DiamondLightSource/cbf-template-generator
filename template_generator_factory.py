@@ -10,6 +10,10 @@ def template_generator_factory(beamline, data_collection_info):
     from i04_template_generator import i04_template_generator
     return i04_template_generator(beamline, data_collection_info)
 
+  if beamline == 'i03':
+    from i03_template_generator import i03_template_generator
+    return i03_template_generator(beamline, data_collection_info)
+
   if beamline == 'i19-1':
     from i19_1_template_generator import i19_1_template_generator
     return i19_1_template_generator(beamline, data_collection_info)
