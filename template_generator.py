@@ -39,6 +39,9 @@ class template_generator(object):
 
 data_auto
 
+_array_data.header_convention "PILATUS_1.2"
+_array_data.header_contents
+;
 # Template auto generated at %s
 # DECTRIS translation table:
 @ Exposure_time     _expt_
@@ -51,6 +54,7 @@ data_auto
 @ X_dimension       _wide_
 @ Y_dimension       _high_
 @ Wavelength        _wave_
+;
 ''' % date_str
 
     if 'chi' in gi['axes']:
