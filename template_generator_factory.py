@@ -5,6 +5,10 @@ def template_generator_factory(beamline, data_collection_info):
   # FIXME there is probably a much better way of doing this without needing to
   # always import all - though the list of beamlines is small so...
 
+  if beamline == 'i02-1':
+    from i02_1_template_generator import i02_1_template_generator
+    return i02_1_template_generator(beamline, data_collection_info)
+
   if beamline == 'i03':
     from i03_template_generator import i03_template_generator
     return i03_template_generator(beamline, data_collection_info)
