@@ -60,8 +60,8 @@ def parameters_to_dc_info(parameters):
   omega = float(parameters['Omega'][0])
   domega = float(parameters['Omega_increment'][0])
   cutoff = int(parameters['Count_cutoff'][0])
-  wide = int(parameters['X-Binary-Size-Fastest-Dimension'][0])
-  high = int(parameters['X-Binary-Size-Second-Dimension'][0])
+  wide = int(parameters['X-Binary-Size-Fastest-Dimension'])
+  high = int(parameters['X-Binary-Size-Second-Dimension'])
   compress = parameters['compression'][0]
 
   # put the parameters which would be filled in by camserver in an appropriate
@@ -103,6 +103,16 @@ def parameters_to_dc_info(parameters):
 
   return dc_info
 
+def make_imgCIF(cbf_header, header, image_data):
+  header = header.replace('--- End of preamble', '')
+  header_text = '\n'.join([record for record in header.split('\n') if not
+                           record.startswith('@')])
+  mime = cbf_header.split('--CIF-BINARY-FORMAT-SECTION--')[1]
+  return header_text + '''
+_array_data.data
+;
+--CIF-BINARY-FORMAT-SECTION--''' + mime + image_data
+
 if __name__ == '__main__':
   import sys
 
@@ -110,4 +120,5 @@ if __name__ == '__main__':
   cbf_header, parameters, image_data = read_miniCBF_image(sys.argv[1])
   dc_info = parameters_to_dc_info(parameters)
   generator = template_generator_factory(sys.argv[2], dc_info)
-  print(generator())
+  header = generator()
+  open(sys.argv[3], 'wb').write(make_imgCIF(cbf_header, header, image_data))
