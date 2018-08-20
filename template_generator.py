@@ -27,9 +27,67 @@ class template_generator(object):
       for key in cs:
         value = str(cs[key])
         result = result.replace(key, value)
-
     return result
 
+  def cleanup(self, header_text):
+    '''Turns out you have to have all the axis definitions in one place, not
+    e.g. two blocks, so collate.'''
+
+    # construct a tree of what we know from the header text, find duplicates,
+    # collate where duplicates found
+
+    def find_all(str, substr):
+      start = 0
+      if not substr:
+        return
+      while True:
+        start = str.find(substr, start)
+        if start == -1:
+          return
+        yield start
+        start += len(substr)
+
+    def fix_loop_blocks(str):
+      name = [ ]
+      defn = { }
+      data = { }
+
+      header = ''
+
+      end = -1
+
+      for loop in find_all(str, 'loop_'):
+        if not header:
+          header = str[:loop]
+        key = header_text[loop+5:loop+5+50].split('.')[0].strip()
+        end = str.find('\n\n', loop)
+        if end == -1:
+          tailer = str[loop:]
+          break
+        block = str[loop+5:end+1].strip()
+        _ = []
+        i = []
+        for record in block.split('\n'):
+          if record.startswith('_'):
+            _.append(record.strip())
+          else:
+            i.append(record.strip())
+
+        if key in name:
+          assert '\n'.join(_) == defn[key]
+          data[key] += '\n'.join(i) + '\n'
+        else:
+          name.append(key)
+          defn[key] = '\n'.join(_)
+          data[key] = '\n'.join(i) + '\n'
+
+      fixed = header
+      for key in name:
+        fixed += '\n\nloop_\n' + defn[key] + '\n' + data[key]
+      fixed += '\n' + tailer
+      return fixed
+
+    return fix_loop_blocks(header_text)
 
   def header(self):
     import datetime
@@ -39,7 +97,7 @@ class template_generator(object):
 
     header = '''###CBF: VERSION 1.1
 
-data_junk
+data_auto
 
 # Template auto generated at %s
 # DECTRIS translation table:
@@ -352,6 +410,8 @@ _axis.equipment
 _axis.depends_on
 _axis.vector[1] _axis.vector[2] _axis.vector[3]
 _axis.offset[1] _axis.offset[2] _axis.offset[3]
+SOURCE     general     source   .         0 0 1 . . .
+GRAVITY    general     gravity  .         0 -1 0 . . .
 '''
     for axis in unrolled:
       x, y, z = axes[axis]['axis']
