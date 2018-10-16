@@ -12,9 +12,10 @@ class template_generator(object):
   '''Base class for template generation - will need to override with useful
   parameters to create a custom imgCIF template for a given beamline.'''
 
-  def __init__(self, beamline, data_collection_parameters):
+  def __init__(self, beamline, data_collection_parameters, mode=None):
     self._beamline = beamline
     self._data_collection_parameters = data_collection_parameters
+    self._mode = mode
 
     return
 

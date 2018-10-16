@@ -24,6 +24,6 @@ class i24_template_generator(dls_template_generator):
       raise RuntimeError, 'unknown mode %s' % mode
 
     self.recursive_update(common, data_collection_info)
-    dls_template_generator.__init__(self, beamline, common)
+    dls_template_generator.__init__(self, beamline, common, mode)
 
     return

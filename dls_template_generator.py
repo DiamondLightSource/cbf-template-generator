@@ -3,7 +3,7 @@ from __future__ import division, print_function
 from template_generator import template_generator
 
 class dls_template_generator(template_generator):
-  def __init__(self, beamline, data_collection_info):
+  def __init__(self, beamline, data_collection_info, mode=None):
     # prior knowledge - common things like detector x, y, z axes
 
     common = {'detector':{'name':'DECTRIS', 'fast':(1,0,0), 'slow':(0,-1,0),
@@ -16,7 +16,7 @@ class dls_template_generator(template_generator):
       'omega':{'axis':(1,0,0), 'depends_on':'.'}}}}
 
     self.recursive_update(common, data_collection_info)
-    template_generator.__init__(self, beamline, common)
+    template_generator.__init__(self, beamline, common, mode)
     return
 
   def source(self):
