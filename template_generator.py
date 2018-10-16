@@ -37,14 +37,8 @@ class template_generator(object):
     di = self.detector_info()
 
     header = '''###CBF: VERSION 1.1
-
-data_auto
-
-_array_data.header_convention "PILATUS_1.2"
-_array_data.header_contents
-;
-# Template auto generated at %s
-# DECTRIS translation table:
+# DECTRIS translation table follows...
+# 
 @ Exposure_time     _expt_
 @ Exposure_period   _expp_
 @ Omega             _omega_
